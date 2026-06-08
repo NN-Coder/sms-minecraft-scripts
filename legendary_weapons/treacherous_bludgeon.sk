@@ -1,0 +1,56 @@
+# MIT License 2026
+# Created by NN-Coder
+# Custom legendary weapon "Treacherous Bludgeon" with passive and ultimate abilities
+
+every 1 second:
+    loop all players:
+        set {_p} to loop-player
+        if uncolored name of {_p}'s tool is "Treacherous Bludgeon":
+            set {_tool} to "%type of {_p}'s tool%"
+            if {_tool} contains "mace":
+                
+                apply glowing to {_p} for 2 seconds
+
+on right click:
+    if uncolored name of player's tool is "Treacherous Bludgeon":
+        set {_tool} to "%type of player's tool%"
+        if {_tool} contains "mace":
+            
+
+            if player is sneaking:
+                cancel event
+                
+                if player is not op:
+                    set {_cd} to difference between {tb.dash.%player's uuid%} and now
+                    if {_cd} is less than 15 seconds:
+                        set {_wait} to difference between 15 seconds and {_cd}
+                        send "&7[Bludgeon] Dash on cooldown for %{_wait}%!" to player
+                        stop
+                
+                set {tb.dash.%player's uuid%} to now
+                send "&7&l[Treacherous Bludgeon] &fDashing forward!" to player
+                
+                push player forward at speed 1.4
+                play sound "entity.player.attack.sweep" at player for player
+                execute console command "execute at %player% run particle minecraft:cloud ~ ~1 ~ 0.2 0.2 0.2 0.1 10 normal"
+
+            else:
+                cancel event
+                
+                if player is not op:
+                    set {_cd} to difference between {tb.drop.%player's uuid%} and now
+                    if {_cd} is less than 180 seconds:
+                        set {_wait} to difference between 180 seconds and {_cd}
+                        send "&8[Bludgeon] Hammer Drop on cooldown for %{_wait}%!" to player
+                        stop
+                
+                set {tb.drop.%player's uuid%} to now
+                send "&8&l[Treacherous Bludgeon] &4HAMMER DROP!" to player
+                
+                push player downward at speed 3.0
+                
+                create an explosion of force 3 at block below player
+                
+                play sound "entity.lightning_bolt.impact" at player for player
+                play sound "entity.zombie_villager.converted" at player for player
+                execute console command "execute at %player% run particle minecraft:explosion_emitter ~ ~ ~ 1 0.5 1 0.1 5 normal"
