@@ -1,0 +1,73 @@
+# MIT License 2026
+# Created by NN-Coder
+# Custom legendary weapon "Phantomguard Partisan" with passive and ultimate abilities
+
+every 1 second:
+    loop all players:
+        set {_p} to loop-player
+        if uncolored name of {_p}'s tool is "Phantomguard Partisan":
+            if {_p}'s tool is a netherite spear:
+                
+                apply speed to {_p} for 2 seconds
+
+
+on right click:
+    if uncolored name of player's tool is "Phantomguard Partisan":
+        if player's tool is a netherite spear:
+
+            if player is sneaking:
+                cancel event 
+                
+                if player is not op:
+                    set {_cd} to difference between {pg.toss.%player's uuid%} and now
+                    if {_cd} is less than 30 seconds:
+                        set {_wait} to difference between 30 seconds and {_cd}
+                        send "&9[Phantomguard] Toss on cooldown for %{_wait}%!" to player
+                        stop
+                
+                set {pg.toss.%player's uuid%} to now
+                send "&b&l[Phantomguard] &7Spear tossed!" to player
+                
+                shoot an arrow from player at speed 2.5
+                set metadata value "phantom_spear" of last shot entity to true
+                
+                set {_spear} to last shot entity
+                loop 20 times:
+                    if {_spear} is alive:
+                        execute console command "execute at %uuid of {_spear}% run particle minecraft:soul ~ ~ ~ 0.1 0.1 0.1 0.02 2 normal"
+                        wait 1 tick
+
+            else if block below player is air:
+                if player is not op:
+                    set {_cd} to difference between {pg.agility.%player's uuid%} and now
+                    if {_cd} is less than 180 seconds:
+                        set {_wait} to difference between 180 seconds and {_cd}
+                        send "&9[Phantomguard] Heightened Agility on cooldown for %{_wait}%!" to player
+                        stop
+                
+                set {pg.agility.%player's uuid%} to now
+                send "&b&l[Phantomguard] &9AGILITY HEIGHTENED!" to player
+                
+                push player forward at speed 1.8
+                
+
+                execute console command "effect give %player% minecraft:speed 15 3 true"
+                execute console command "effect give %player% minecraft:dolphins_grace 15 0 true"
+                execute console command "effect give %player% minecraft:invisibility 15 0 true"
+                
+                play sound "entity.phantom.flap" at player for player
+                execute console command "execute at %player% run particle minecraft:squid_ink ~ ~1 ~ 0.5 0.5 0.5 0.1 20 normal"
+
+
+
+on damage:
+    if projectile is set:
+        if metadata value "phantom_spear" of projectile is true:
+            cancel event
+            reduce victim's health by 9
+            play sound "entity.phantom.bite" at victim for attacker
+            delete projectile
+
+on projectile hit:
+    if metadata value "phantom_spear" of projectile is true:
+        delete projectile
