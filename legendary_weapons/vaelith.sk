@@ -1,0 +1,79 @@
+# MIT License 2026
+# Created by NN-Coder
+# Custom legendary weapon "Vaelith" with passive and ultimate abilities
+
+every 1 second:
+    loop all players:
+        set {_p} to loop-player
+        if uncolored name of {_p}'s tool is "Vaelith":
+            if {_p}'s tool is a netherite sword:
+                
+                apply strength to {_p} for 2 seconds
+                
+                loop all entities within 15 blocks of {_p}:
+                    set {_e} to loop-entity-2
+                    if {_e} is alive:
+                        if "%uuid of {_e}%" is not "%uuid of {_p}%":
+                            apply glowing to {_e} for 2 seconds
+
+on right click:
+    if uncolored name of player's tool is "Vaelith":
+        if player's tool is a netherite sword:
+          
+            if player is sneaking:
+                if player is not op:
+                    set {_cd} to difference between {vaelith.daggers.%player's uuid%} and now
+                    if {_cd} is less than 25 seconds:
+                        set {_wait} to difference between 25 seconds and {_cd}
+                        send "&c[Vaelith] Daggers on cooldown for %{_wait}%!" to player
+                        stop
+                
+                set {vaelith.daggers.%player's uuid%} to now
+                send "&c&l[Vaelith] &7Unleashing daggers!" to player
+                
+                loop 3 times:
+                    shoot an arrow from player at speed 2
+                    set metadata value "vaelith_dagger" of last shot entity to true
+                    wait 4 ticks
+
+
+            else:
+                if player is not on ground:
+                    
+                    if player is not op:
+                        set {_cd} to difference between {vaelith.berserk.%player's uuid%} and now
+                        if {_cd} is less than 180 seconds:
+                            set {_wait} to difference between 180 seconds and {_cd}
+                            send "&4[Vaelith] Berserk on cooldown for %{_wait}%!" to player
+                            stop
+                            
+                    set {vaelith.berserk.%player's uuid%} to now
+                    send "&4&l[Vaelith] BERSERK ACTIVATED!" to player
+                    
+                    execute console command "effect give %player% minecraft:strength 25 2 true"
+                    execute console command "effect give %player% minecraft:resistance 25 3 true"
+                    play sound "entity.ender_dragon.growl" at player for player
+                    
+                    set {vaelith.berserking.%player's uuid%} to true
+                    wait 25 seconds
+                    delete {vaelith.berserking.%player's uuid%}
+                    send "&7[Vaelith] Your berserk rage has faded." to player
+
+
+on damage:
+    if projectile is set:
+        if metadata value "vaelith_dagger" of projectile is true:
+            cancel event 
+            reduce victim's health by 9
+            damage victim by 0 
+            play sound "entity.player.attack.crit" at victim for attacker
+            delete projectile
+
+on projectile hit:
+    if metadata value "vaelith_dagger" of projectile is true:
+        delete projectile
+
+every 5 ticks:
+    loop all players:
+        if {vaelith.berserking.%loop-player's uuid%} is true:
+            execute console command "execute at %loop-player% run particle dust 1 0 0 1 ~ ~1 ~ 0.5 1 0.5 0 5 normal"
