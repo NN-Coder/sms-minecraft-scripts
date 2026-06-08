@@ -1,0 +1,30 @@
+# MIT License 2026
+# Created by NN-Coder
+# Completely disables the placement or dispensing of end crystals and TNT minecarts
+
+on spawn:
+    set {_entityStr} to "%event-entity%"
+    if {_entityStr} contains "end crystal" or "ender crystal" or "tnt minecart" or "minecart with tnt" or "explosive minecart":
+        cancel event
+
+every 2 seconds:
+    loop all entities:
+        if loop-entity is not a player:
+            set {_e} to "%loop-entity%"
+            if {_e} contains "end crystal" or "ender crystal" or "tnt minecart" or "minecart with tnt" or "explosive minecart":
+                kill loop-entity
+
+
+on right click:
+    set {_tool} to "%type of player's tool%"
+    
+    if {_tool} contains "end crystal" or "ender crystal" or "tnt minecart" or "minecart with tnt" or "explosive minecart":
+        cancel event
+        send "&c&l[Server] &7This item is completely disabled." to player
+
+on dispense:
+    # Converts the dispensed item to text
+    set {_item} to "%event-item%"
+    
+    if {_item} contains "end crystal" or "ender crystal" or "tnt minecart" or "minecart with tnt" or "explosive minecart":
+        cancel event
