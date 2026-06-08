@@ -1,0 +1,47 @@
+# MIT License 2026
+# Created by NN-Coder
+# Disables the use of elytra while in PvP combat using timed tagging.
+options:
+    cooldown: 15
+    
+    prefix: &c&l[Combat] &7
+
+on damage:
+    if attacker is a player:
+        if victim is a player:
+            
+            set metadata value "combat_tagged" of attacker to true
+            set {combat.timer.%attacker's uuid%} to now
+            
+            set metadata value "combat_tagged" of victim to true
+            set {combat.timer.%victim's uuid%} to now
+
+every 1 second:
+    loop all players:
+        if metadata value "combat_tagged" of loop-player is true:
+            set {_cd} to difference between {combat.timer.%loop-player's uuid%} and now
+            if {_cd} is greater than or equal to {@cooldown} seconds:
+                delete metadata value "combat_tagged" of loop-player
+                send "{@prefix}You are no longer in combat. Elytras enabled!" to loop-player
+
+
+
+on right click with elytra:
+    if metadata value "combat_tagged" of player is true:
+        cancel event
+        send "{@prefix}You cannot equip an Elytra while in combat!" to player
+
+every 5 ticks:
+    loop all players:
+        if metadata value "combat_tagged" of loop-player is true:
+            
+            if loop-player's chestplate is an elytra:
+                set {_item} to loop-player's chestplate
+                set loop-player's chestplate to air
+                
+                if loop-player can hold {_item}:
+                    give {_item} to loop-player
+                else:
+                    drop {_item} at loop-player's location
+                
+                send "{@prefix}Your Elytra was unequipped because you are in combat!" to loop-player
