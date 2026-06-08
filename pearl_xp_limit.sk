@@ -1,0 +1,58 @@
+# MIT License 2026
+# Created by NN-Coder
+# Limits the amount of bottles of experience and ender pearls in an inventory
+
+on inventory click:
+    wait 1 tick
+    
+    set {_xp} to amount of experience bottle in player's inventory
+    if {_xp} > 192:
+        set {_excess} to {_xp} - 192
+        remove {_excess} of experience bottle from player's inventory
+        drop {_excess} of experience bottle at player's location
+        send "&c&l[Limit] &7Maximum 3 stacks of XP allowed!" to player
+        
+    set {_pearls} to amount of ender pearl in player's inventory
+    if {_pearls} > 96:
+        set {_excess} to {_pearls} - 96
+        remove {_excess} of ender pearl from player's inventory
+        drop {_excess} of ender pearl at player's location
+        send "&c&l[Limit] &7Maximum 6 stacks of Pearls allowed!" to player
+
+    set {_top} to player's current inventory
+    if {_top} is set:
+        if {_top} is not player's inventory:
+            
+            set {_topXP} to amount of experience bottle in {_top}
+            if {_topXP} > 192:
+                set {_excess} to {_topXP} - 192
+                remove {_excess} of experience bottle from {_top}
+                drop {_excess} of experience bottle at player's location
+                send "&c&l[Limit] &7Container exceeds the 3 stack XP limit!" to player
+                
+            set {_topPearls} to amount of ender pearl in {_top}
+            if {_topPearls} > 96:
+                set {_excess} to {_topPearls} - 96
+                remove {_excess} of ender pearl from {_top}
+                drop {_excess} of ender pearl at player's location
+                send "&c&l[Limit] &7Container exceeds the 6 stack Pearl limit!" to player
+
+
+on pickup:
+    set {_item} to "%event-item%"
+    if {_item} contains "experience bottle" or "ender pearl":
+        wait 1 tick
+        
+        set {_xp} to amount of experience bottle in player's inventory
+        if {_xp} > 192:
+            set {_excess} to {_xp} - 192
+            remove {_excess} of experience bottle from player's inventory
+            drop {_excess} of experience bottle at player's location
+            send "&c&l[Limit] &7You can only hold 3 stacks of XP." to player
+            
+        set {_pearls} to amount of ender pearl in player's inventory
+        if {_pearls} > 96:
+            set {_excess} to {_pearls} - 96
+            remove {_excess} of ender pearl from player's inventory
+            drop {_excess} of ender pearl at player's location
+            send "&c&l[Limit] &7You can only hold 6 stacks of Pearls." to player
