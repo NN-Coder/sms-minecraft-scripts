@@ -1,0 +1,80 @@
+# MIT License 2026
+# Created by NN-Coder
+# Custom legendary weapon "Viridian Greataxe" with passive and ultimate abilities
+
+every 2 seconds:
+    loop all players:
+        set {_p} to loop-player
+        if uncolored name of {_p}'s tool is "Viridian Greataxe":
+            set {_tool} to "%type of {_p}'s tool%"
+            
+            if {_tool} contains "axe":
+                apply regeneration to {_p} for 3 seconds
+
+
+on damage:
+    if attacker is a player:
+        if damage cause is attack:
+            if uncolored name of attacker's tool is "Viridian Greataxe":
+                set {_tool} to "%type of attacker's tool%"
+                if {_tool} contains "axe":
+                    
+                    if attacker is not on ground:
+                        if y-coordinate of velocity of attacker < 0:
+                            
+                            if metadata value "crit_streak" of attacker is not set:
+                                set metadata value "crit_streak" of attacker to 0
+                            
+                            add 1 to metadata value "crit_streak" of attacker
+                            
+                            if metadata value "crit_streak" of attacker >= 3:
+                                strike lightning at victim
+                                set metadata value "crit_streak" of attacker to 0 # Reset after lightning
+                            stop
+                    
+                    set metadata value "crit_streak" of attacker to 0
+
+on quit:
+    clear metadata value "crit_streak" of player
+
+
+on right click:
+    if player is sneaking:
+        if uncolored name of player's tool is "Viridian Greataxe":
+            set {_tool} to "%type of player's tool%"
+            if {_tool} contains "axe":
+                cancel event
+                
+                if player is not op:
+                    set {_cd} to difference between {vg.swing.%player's uuid%} and now
+                    if {_cd} is less than 120 seconds:
+                        set {_wait} to difference between 120 seconds and {_cd}
+                        send "&2[Viridian] Axe Swing on cooldown for %{_wait}%!" to player
+                        stop
+                
+                set {vg.swing.%player's uuid%} to now
+                send "&2&l[Viridian] &aAxe Swung!" to player
+                play sound "item.trident.throw" at player for player
+                
+                shoot an arrow from player at speed 2.5
+                set {_proj} to last shot entity
+                set metadata value "vg_axe_throw" of {_proj} to true
+                
+                loop 15 times:
+                    if {_proj} is alive:
+                        execute console command "execute at %uuid of {_proj}% run particle minecraft:sweep_attack ~ ~ ~ 0 0 0 0.1 1 normal"
+                        wait 2 ticks
+                
+                if {_proj} is alive:
+                    kill {_proj}
+
+
+on damage:
+    if projectile is set:
+        if metadata value "vg_axe_throw" of projectile is true:
+            
+            play sound "entity.zombie.break_wooden_door" at victim for attacker
+            execute console command "execute at %uuid of victim% run particle minecraft:crit ~ ~1 ~ 0.5 0.5 0.5 0.1 10 normal"
+            
+            set {_hp} to victim's health
+            
